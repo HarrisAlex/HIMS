@@ -47,7 +47,7 @@ class Item {
         Item.instances.delete(id);
     }
 }
-
+t
 Item.instances = new Map();
 
 function addItem() {
