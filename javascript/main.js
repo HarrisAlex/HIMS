@@ -1,62 +1,54 @@
+class GUID {
+    static generate() {
+        GUID.lastGUID++;
+        return GUID.lastGUID;
+    }
+}
+
+GUID.lastGUID = 0;
+
 class Item {
+    id;
     name;
     price;
     amount;
     unit;
+    unitPrice;
 
-    constructor(name, price, amount, unit, index) {
+    constructor(name, price, amount, unit, unitPrice) {
         this.name = name;
         this.price = price;
         this.amount = amount;
         this.unit = unit;
-    }
-
-    unitPrice() {
-        return this.price / this.amount;
+        this.unitPrice = unitPrice
     }
 
     useItem(amount) {
         this.amount -= amount;
+
         if (this.amount <= 0) {
             removeItem(this.index);
         }
     }
 
-    getIndex() {
-        return Item.getItemIndex(this.name);
-    }
-
-    static getItemIndex(name) {
-        for (var i = 0; i < Item.instances.length; i++) {
-            if (Item.instances[i].name == name) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
     static addItem(item) {
-        for (var i = 0; i < Item.instances.length; i++) {
-            if (Item.instances[i] == null) {
-                Item.instances[i] = item;
+        for (const value of Item.instances.values()) {
+            if (value.name == item.name && value.unitPrice == item.unitPrice) {
+                value.amount = Number(value.amount) + Number(item.amount);
                 return;
             }
         }
 
-        Item.instances.push(item);
+        item.id = GUID.generate();
+        Item.instances.set(item.id, item);
     }
 
-    static removeItem(name) {
-        var item = Item.getItemIndex(name);
-
-        if (item == -1)
-            return;
-
-        delete Item.instances[item];
+    static removeItem(id) {
+        Item.instances.delete(id);
     }
 }
 
-Item.instances = [];
+Item.instances = new Map();
 
 function addItem() {
     var itemName = $("#item-name").val();
@@ -79,7 +71,7 @@ function addItem() {
     if (itemUnit == "")
         return;
 
-    var item = new Item(itemName, itemPrice, itemAmount, itemUnit);
+    var item = new Item(itemName, itemPrice, itemAmount, itemUnit, itemPrice / itemAmount);
     Item.addItem(item);
     createItemList();
 }
@@ -87,9 +79,11 @@ function addItem() {
 function createItemList() {
     $("#item-list").empty();
 
-    for (var i = 0; i < Item.instances.length; i++) {
-        if (Item.instances[i] != null) {
-            $("#item-list").append("<div class='item'><a onclick='removeItem(" + i + ")'>X</a><li>(" + Item.instances[i].amount + " " + Item.instances[i].unit + ") " + Item.instances[i].name + " , unit price of $" + Item.instances[i].unitPrice() + "</li></div>");
+    for (const[key, value] of Item.instances) {
+        if (value != null) {
+            var item = $("#item-list").append("<div class='item'><li>(" + value.amount + " " + value.unit + ") " + value.name + " , unit price of $" + trimNumber(value.unitPrice) + ", id [" + key + "]</li></div>");
+            var deleteButton = item.append("<button>Delete</button>");
+            $(deleteButton).click(function() { removeItem(key); });
         }
     }
 }
@@ -99,6 +93,7 @@ function removeItem(index) {
     createItemList();
 }
 
-function useItem(name, amount) {
 
+function trimNumber(number) {
+    return Number(number).toFixed(2);
 }

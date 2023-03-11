@@ -1,8 +1,10 @@
 .item {
     display: flex;
     flex-direction: row;
+
+    gap: 10px;
 }
 
-.item a {
+button {
     cursor: pointer;
 }
