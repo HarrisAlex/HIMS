@@ -2,28 +2,38 @@
 <html>
     <head>
         <script type="text/javascript" src="javascript/jquery-3.6.3.min.js"></script>
-        <script type="text/javascript" src="javascript/main.js"></script>
         <link href="styles/main.css" rel="stylesheet" type="text/css" />
+        <script type="module" src="javascript/item.js"></script>
+        <script type="module" src="javascript/popup.js"></script>
+        <script type="module" src="javascript/main.js"></script>
     </head>
     <body>
-        <h1>HIMS</h1>
+        <h1><span class="small-caps">H</span>IMS</h1>
         <h2>Household Inventory Management</h2>
         <form>
             <input id="item-name" type="text" name="name" placeholder="Name" />
-            <input id="item-price" type="number" name="price" placeholder="Price" />
-            <input id="item-amount" type="number" name="amount" placeholder="Amount" />
+            <input id="item-price" type="number" name="price" placeholder="Price" step="0.01" min="0.01"/>
+            <input id="item-amount" type="number" name="amount" placeholder="Amount" min="0" />
             <select id="item-unit" type="dropdown" name="unit" placeholder="Unit">
-                <option value="lbs">lbs</option>
-                <option value="oz">oz</option>
-                <option value="cups">cups</option>
-                <option value="pieces">pieces</option>
-                <option value="grams">g</option>
-                <option value="liters">l</option>
+                <option value="lbs">Pounds (lbs)</option>
+                <option value="oz">Ounce (oz)</option>
+                <option value="cups">Cups (C)</option>
+                <option value="pieces">Pieces</option>
+                <option value="grams">Grams (g)</option>
+                <option value="liters">Liters (L)</option>
             </select>
-            <input onclick="addItem()" type="button" value="Submit">
+            <input id="item-submit" type="button" value="Submit">
         </form>
-        <ul id="item-list">
-
-        </ul>
+        <div id="item-list"></div>
+        <div id="PU_use-item" class="popup">
+            <h2 class="PU_heading">Item Name</h2>
+            <form>
+                <input id="use-amount" type="number" name="use-amount" placeholder="Amount" min="0" />
+                <input id="use-submit" type="button" value="Submit" />
+            </form>
+            <button class="PU_close-button">Close</button>
+        </div>
+        <div id="PU_close-area"></div>
+        <footer>HIMS Copyright (c) 2023 Alex Harris</footer>
     </body>
 </html>

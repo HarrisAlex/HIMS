@@ -1,10 +1,150 @@
+:root {
+    --background: rgb(25, 25, 25);
+    --pop-up: rgba(32, 32, 32, 0.85);
+    --pop-up-blur: 10px;
+    --text: rgb(225, 225, 225);
+}
+
+body {
+    background-color: var(--background);
+    color: var(--text);
+    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+p {
+    margin: 0;
+}
+
+.small-caps {
+    font-size: 0.8em;
+}
+
+#item-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    margin: 1rem 0 1rem 0;
+
+    column-gap: 0.6rem;
+    row-gap: 1rem;
+}
+
 .item {
     display: flex;
     flex-direction: row;
+    justify-content: space-between;
 
-    gap: 10px;
+    background-color: var(--pop-up);
+
+    border: solid 2px var(--text);
+    border-radius: 5px;
+
+    padding: 0.5rem;
+}
+
+.item-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.item-buttons button {
+    width: 100%;
 }
 
 button {
     cursor: pointer;
+    height: fit-content;
+    width: fit-content;
+}
+
+.item-buttons {
+    display: flex;
+    flex-direction: column;
+
+    width: fit-content;
+}
+
+.popup {
+    pointer-events: none;
+    position:absolute;
+    width: 85vw;
+    height: fit-content;
+
+    z-index: 2;
+
+    padding: 2rem;
+
+    box-sizing: border-box;
+
+    top: 7.5vh;
+    left: 7.5vw;
+    background-color: var(--pop-up);
+
+    backdrop-filter: blur(var(--pop-up-blur));
+    -webkit-backdrop-filter: blur(var(--pop-up-blur));
+
+    transform: translateY(3rem);
+    opacity: 0;
+
+    transition: transform 0.75s ease-in-out, opacity 0.75s ease-in-out;
+    -webkit-transition: transform 0.75s ease-in-out, opacity 0.75s ease-in-out;
+
+    border: solid 2px var(--text);
+    border-radius: 20px;
+}
+
+.popup.visible {
+    pointer-events: auto;
+    transform: translateY(0);
+    opacity: 100%;
+}
+
+#PU_close-area {
+    position: absolute;
+
+    z-index: 1;
+    
+    width: 100vw;
+    height: 100vh;
+
+    top: 0;
+    left: 0;
+}
+
+footer {
+    font-size: 14px;
+}
+
+@media screen and (max-width: 650px) {
+    #item-list {
+        grid-template-columns: 1fr;
+    }
+
+    .item {
+        width: fit-content;
+        margin: 0 auto 0 auto;
+        flex-direction: column;
+    }
+
+    .item-buttons {
+        width: 100%;
+        align-items: center;
+    }
+
+    .item-buttons button {
+        width: fit-content;
+    }
+}
+
+@media screen and (min-width: 900px) {
+    #item-list {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+}
+
+
+@media screen and (min-width: 1200px) {
+    #item-list {
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+    }
 }

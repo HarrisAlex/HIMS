@@ -1,54 +1,55 @@
-class GUID {
-    static generate() {
-        GUID.lastGUID++;
-        return GUID.lastGUID;
+import {Item} from "./item.js";
+import {Popup} from "./popup.js";
+
+$("#item-price").on("focusin", function(event) {
+    if ($(this).val() === "0.00") {
+        $(this).val("");
     }
-}
+});
 
-GUID.lastGUID = 0;
-
-class Item {
-    id;
-    name;
-    price;
-    amount;
-    unit;
-    unitPrice;
-
-    constructor(name, price, amount, unit, unitPrice) {
-        this.name = name;
-        this.price = price;
-        this.amount = amount;
-        this.unit = unit;
-        this.unitPrice = unitPrice
+$("#item-price").on("focusout", function(event) {
+    var selection = window.getSelection().toString();
+    if (selection !== '') {
+        return;
     }
 
-    useItem(amount) {
-        this.amount -= amount;
-
-        if (this.amount <= 0) {
-            removeItem(this.index);
-        }
+    if ($.inArray(event.keyCode, [38, 40, 37, 39]) !== -1) {
+        return;
     }
 
-    static addItem(item) {
-        for (const value of Item.instances.values()) {
-            if (value.name == item.name && value.unitPrice == item.unitPrice) {
-                value.amount = Number(value.amount) + Number(item.amount);
-                return;
-            }
-        }
+    var $this = $(this);
+    $this.val(trimNumber($this.val()));
+});
 
-        item.id = GUID.generate();
-        Item.instances.set(item.id, item);
+$("#item-amount").on("focusout", function(event) {
+    var selection = window.getSelection().toString();
+    if (selection !== '') {
+        return;
     }
 
-    static removeItem(id) {
-        Item.instances.delete(id);
+    if ($.inArray(event.keyCode, [38, 40, 37, 39]) !== -1) {
+        return;
     }
-}
-t
-Item.instances = new Map();
+
+    var $this = $(this);
+    $this.val(Number($this.val()));
+});
+
+$("#use-amount").on("focusout", function(event) {
+    var selection = window.getSelection().toString();
+    if (selection !== '') {
+        return;
+    }
+
+    if ($.inArray(event.keyCode, [38, 40, 37, 39]) !== -1) {
+        return;
+    }
+
+    var $this = $(this);
+    $this.val(Number($this.val()));
+});
+
+$("#item-submit").click(function() { addItem(); });
 
 function addItem() {
     var itemName = $("#item-name").val();
@@ -76,24 +77,57 @@ function addItem() {
     createItemList();
 }
 
+var activeItem;
+
+var PU_closeArea = $("#PU_close-area");
+
+var PU_useItemElement = $("#PU_use-item");
+var PU_useItem = new Popup(PU_useItemElement, PU_useItemElement.find(".PU_close-button"), PU_closeArea);
+
+$(PU_useItem).on("openEvent", function() {
+    var item = Item.getItem(activeItem);
+    PU_useItemElement.find(".PU_heading").text(item.name);
+});
+
 function createItemList() {
     $("#item-list").empty();
 
     for (const[key, value] of Item.instances) {
         if (value != null) {
-            var item = $("#item-list").append("<div class='item'><li>(" + value.amount + " " + value.unit + ") " + value.name + " , unit price of $" + trimNumber(value.unitPrice) + ", id [" + key + "]</li></div>");
-            var deleteButton = item.append("<button>Delete</button>");
-            $(deleteButton).click(function() { removeItem(key); });
+            let itemElement = $("<div class='item'></div>");
+            $("#item-list").append(itemElement);
+            let itemText = $("<div class='item-text'></div>");
+            itemElement.append(itemText);
+            let itemName = $("<p>" + value.name + "</p>");
+            itemText.append(itemName);
+            let itemAmount = $("<p>" + value.amount + " " + value.unit + "</p>");
+            itemText.append(itemAmount);
+            let unitPrice = $("<p>unit price of $" + trimNumber(value.unitPrice) + " per " + value.unit.replace('s', '') + "</p>");
+            itemText.append(unitPrice);
+            let itemButtons = $("<div class='item-buttons'></div>");
+            itemElement.append(itemButtons);
+            let deleteButton = $("<button>Delete</button>");
+            itemButtons.append(deleteButton);
+            let useButton = $("<button>Use</button>");
+            itemButtons.append(useButton);
+            $(deleteButton).click(function() { removeItem(key) });
+            $(useButton).click(function() { activeItem = key; PU_useItem.open(); });
         }
     }
 }
 
-function removeItem(index) {
-    Item.removeItem(index);
+function removeItem(item) {
+    Item.removeItem(item);
     createItemList();
 }
 
-
 function trimNumber(number) {
     return Number(number).toFixed(2);
+}
+
+$("#use-submit").click(function() { useItem() });
+
+function useItem() {
+    Item.getItem(activeItem).useItem($("#use-amount").val());
+    createItemList();
 }
